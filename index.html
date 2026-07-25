@@ -133,6 +133,11 @@
     color: var(--teal);
   }
   .slot.protected .slot-time { color: var(--teal); }
+  .slot.optional .slot-text {
+    font-style: italic;
+    color: var(--ink-faint);
+  }
+  .slot.optional .slot-time { color: var(--ink-faint); }
 
   .principles {
     margin-top: 2rem;
@@ -180,6 +185,7 @@
     <button class="phase-btn active" data-phase="p1">Phase 1 — Search Only</button>
     <button class="phase-btn" data-phase="p2v">Phase 2 — + Volunteering</button>
     <button class="phase-btn" data-phase="p2b">Phase 2 — + Bridge Job</button>
+    <button class="phase-btn" data-phase="p3">Phase 3 — Full-Time Job</button>
   </div>
 
   <p class="phase-note" id="phase-note"></p>
@@ -196,7 +202,7 @@
     </ul>
   </div>
 
-  <p class="footer-note">GREEN TEXT = PROTECTED TIME, DOES NOT GET DISPLACED</p>
+  <p class="footer-note">GREEN BOLD = PROTECTED, DOES NOT GET DISPLACED  ·  GRAY ITALIC = OPTIONAL, NOT REQUIRED</p>
 
 </div>
 
@@ -207,7 +213,7 @@
       note: "No volunteer or temp job yet. Job search owns the late morning; the rest of the day supports it.",
       days: [
         { title: "Weekday (Mon–Fri)", slots: [
-          ["Morning", "Wake, then walk / rehab — before screens", true],
+          ["Morning", "Wake, coffee and breakfast, then walk / rehab — before screens", true],
           ["Late AM", "Primary job-search block (~90 min): outreach, applications"],
           ["Midday", "Lunch, real break"],
           ["Early PM", "Secondary block (~45–60 min): admin, alerts, research"],
@@ -229,14 +235,14 @@
       note: "Volunteering added. Core spine unchanged — volunteer shifts double as social + lane-relevant time.",
       days: [
         { title: "Volunteer-Shift Day", slots: [
-          ["Morning", "Wake, walk / rehab", true],
+          ["Morning", "Wake, coffee and breakfast, then walk / rehab", true],
           ["Late AM", "Primary job-search block (~90 min)"],
           ["Shift", "Volunteer shift — also covers social/engagement need", true],
           ["Evening", "Lighter or moved — shift already covered social time"],
           ["Before bed", "Wind down", true],
         ]},
         { title: "Non-Shift Weekday", slots: [
-          ["Morning", "Wake, walk / rehab", true],
+          ["Morning", "Wake, coffee and breakfast, then walk / rehab", true],
           ["Late AM", "Primary job-search block (~90 min)"],
           ["Early PM", "Secondary admin block (~45–60 min)"],
           ["Evening", "Protected social time", true],
@@ -251,7 +257,7 @@
       note: "Bridge/temp job added. Job search moves to the edges of the day; weekends become the main search time.",
       days: [
         { title: "Work Day", slots: [
-          ["Early AM", "Walk / rehab, or short job-search session before work"],
+          ["Early AM", "Walk / rehab or short job-search session before work"],
           ["Workday", "Bridge job", true],
           ["Evening", "One focused job-search session OR exercise (alternate as needed)"],
           ["Before bed", "Protected downtime — burnout risk rises here", true],
@@ -266,6 +272,25 @@
           ["Evening", "Callboard weekly check-in — the key planning anchor now", true],
         ]},
       ]
+    },
+    p3: {
+      note: "Full-time job in hand. No bridge job, no active search. Volunteering continues only if desired — no longer strategic, purely optional.",
+      days: [
+        { title: "Work Day", slots: [
+          ["Morning", "Exercise / rehab", true],
+          ["Workday", "The job", true],
+          ["Evening", "Open — social, rest, or optional career development (CMP/CSEP, CPDT, etc.)"],
+          ["Optional", "Volunteering, if still wanted — no longer required", 'optional'],
+        ]},
+        { title: "Saturday", slots: [
+          ["All day", "Rest, social, hobbies", true],
+          ["Optional", "Volunteering or personal projects, if desired", 'optional'],
+        ]},
+        { title: "Sunday", slots: [
+          ["Daytime", "Rest, personal time", true],
+          ["Evening", "No mandatory check-in — light planning only if still useful", 'optional'],
+        ]},
+      ]
     }
   };
 
@@ -275,7 +300,9 @@
     var grid = document.getElementById('day-grid');
     grid.innerHTML = d.days.map(function (day) {
       var slotsHtml = day.slots.map(function (s) {
-        var cls = s[2] ? 'slot protected' : 'slot';
+        var cls = 'slot';
+        if (s[2] === 'optional') cls = 'slot optional';
+        else if (s[2]) cls = 'slot protected';
         return '<div class="' + cls + '"><div class="slot-time">' + s[0] + '</div><div class="slot-text">' + s[1] + '</div></div>';
       }).join('');
       return '<div class="day-card">' +
