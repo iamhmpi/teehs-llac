@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>The Weekly Call Sheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F5F3EC;
+    --card: #FFFFFF;
+    --ink: #23211D;
+    --ink-soft: #6B675F;
+    --ink-faint: #9C988C;
+    --amber: #C98A2B;
+    --amber-deep: #8C5F1D;
+    --amber-bg: #F5E8D0;
+    --teal: #2B6B63;
+    --teal-bg: #E1EEEB;
+    --line: #D8D4C8;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.5;
+    padding: 0 0 3rem;
+  }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 2rem 1.25rem 1rem; }
+
+  .header {
+    text-align: center;
+    margin-bottom: 1.75rem;
+  }
+  .header h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 24px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin: 0 0 4px;
+  }
+  .header p {
+    color: var(--ink-soft);
+    font-size: 13px;
+    margin: 0;
+  }
+
+  .phase-toggle {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 1.75rem;
+    flex-wrap: wrap;
+  }
+  .phase-toggle button {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 9px 14px;
+    border: 1.5px solid var(--ink);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 6px;
+  }
+  .phase-toggle button.active {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .phase-note {
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-style: italic;
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 1.75rem;
+  }
+
+  .day-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+  @media (min-width: 640px) {
+    .day-grid { grid-template-columns: 1fr 1fr 1fr; }
+  }
+
+  .day-card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .day-card-header {
+    background: var(--ink);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 12px;
+  }
+  .day-card-body { padding: 10px 12px; }
+
+  .slot {
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 8px;
+    padding: 7px 0;
+    border-bottom: 0.5px solid var(--line);
+  }
+  .slot:last-child { border-bottom: none; }
+  .slot-time {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--amber-deep);
+    font-weight: 600;
+    padding-top: 1px;
+  }
+  .slot-text {
+    font-size: 13px;
+    color: var(--ink);
+  }
+  .slot.protected .slot-text {
+    font-weight: 600;
+    color: var(--teal);
+  }
+  .slot.protected .slot-time { color: var(--teal); }
+
+  .principles {
+    margin-top: 2rem;
+    border-left: 3px solid var(--amber);
+    background: var(--card);
+    padding: 1rem 1.25rem;
+    font-size: 13px;
+    color: var(--ink-soft);
+  }
+  .principles .label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 600;
+    font-size: 11px;
+    color: var(--amber-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .principles ul { margin: 0; padding-left: 18px; }
+  .principles li { margin-bottom: 4px; }
+
+  .footer-note {
+    text-align: center;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 2rem;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  @media print {
+    .phase-toggle { display: none; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <h1>The Weekly Call Sheet</h1>
+    <p>Daily structure for the job search</p>
+  </div>
+
+  <div class="phase-toggle">
+    <button class="phase-btn active" data-phase="p1">Phase 1 — Search Only</button>
+    <button class="phase-btn" data-phase="p2v">Phase 2 — + Volunteering</button>
+    <button class="phase-btn" data-phase="p2b">Phase 2 — + Bridge Job</button>
+  </div>
+
+  <p class="phase-note" id="phase-note"></p>
+
+  <div class="day-grid" id="day-grid"></div>
+
+  <div class="principles">
+    <span class="label">Standing rules — apply in every phase</span>
+    <ul>
+      <li>Same anchor times every day (wake, exercise, main block) even as content inside them changes.</li>
+      <li>Split "job search" into sub-tasks — outreach, applications, research, admin — rather than one undifferentiated block.</li>
+      <li>Exercise/rehab is non-negotiable — medical, not optional fitness.</li>
+      <li>Protect the social block deliberately — it disappears first if left unscheduled.</li>
+    </ul>
+  </div>
+
+  <p class="footer-note">GREEN TEXT = PROTECTED TIME, DOES NOT GET DISPLACED</p>
+
+</div>
+
+<script>
+(function () {
+  var DATA = {
+    p1: {
+      note: "No volunteer or temp job yet. Job search owns the late morning; the rest of the day supports it.",
+      days: [
+        { title: "Weekday (Mon–Fri)", slots: [
+          ["Morning", "Wake, then walk / rehab — before screens", true],
+          ["Late AM", "Primary job-search block (~90 min): outreach, applications"],
+          ["Midday", "Lunch, real break"],
+          ["Early PM", "Secondary block (~45–60 min): admin, alerts, research"],
+          ["Late PM", "Flex — errands, volunteer-org follow-ups"],
+          ["Evening", "Protected social time — not job search", true],
+          ["Before bed", "Wind down, no screens / no job search", true],
+        ]},
+        { title: "Saturday", slots: [
+          ["All day", "Mostly personal — rest, social, hobbies", true],
+          ["Optional", "Job search largely off"],
+        ]},
+        { title: "Sunday", slots: [
+          ["Daytime", "Personal time"],
+          ["Evening", "Callboard weekly check-in: review alerts, plan the week", true],
+        ]},
+      ]
+    },
+    p2v: {
+      note: "Volunteering added. Core spine unchanged — volunteer shifts double as social + lane-relevant time.",
+      days: [
+        { title: "Volunteer-Shift Day", slots: [
+          ["Morning", "Wake, walk / rehab", true],
+          ["Late AM", "Primary job-search block (~90 min)"],
+          ["Shift", "Volunteer shift — also covers social/engagement need", true],
+          ["Evening", "Lighter or moved — shift already covered social time"],
+          ["Before bed", "Wind down", true],
+        ]},
+        { title: "Non-Shift Weekday", slots: [
+          ["Morning", "Wake, walk / rehab", true],
+          ["Late AM", "Primary job-search block (~90 min)"],
+          ["Early PM", "Secondary admin block (~45–60 min)"],
+          ["Evening", "Protected social time", true],
+        ]},
+        { title: "Weekend", slots: [
+          ["Saturday", "Mostly personal", true],
+          ["Sunday PM", "Callboard weekly check-in", true],
+        ]},
+      ]
+    },
+    p2b: {
+      note: "Bridge/temp job added. Job search moves to the edges of the day; weekends become the main search time.",
+      days: [
+        { title: "Work Day", slots: [
+          ["Early AM", "Walk / rehab, or short job-search session before work"],
+          ["Workday", "Bridge job", true],
+          ["Evening", "One focused job-search session OR exercise (alternate as needed)"],
+          ["Before bed", "Protected downtime — burnout risk rises here", true],
+        ]},
+        { title: "Saturday", slots: [
+          ["Morning", "Exercise / rehab", true],
+          ["Midday", "Main weekly job-search block — applications, outreach"],
+          ["Afternoon", "Social time", true],
+        ]},
+        { title: "Sunday", slots: [
+          ["Daytime", "Personal time, rest", true],
+          ["Evening", "Callboard weekly check-in — the key planning anchor now", true],
+        ]},
+      ]
+    }
+  };
+
+  function render(phase) {
+    var d = DATA[phase];
+    document.getElementById('phase-note').textContent = d.note;
+    var grid = document.getElementById('day-grid');
+    grid.innerHTML = d.days.map(function (day) {
+      var slotsHtml = day.slots.map(function (s) {
+        var cls = s[2] ? 'slot protected' : 'slot';
+        return '<div class="' + cls + '"><div class="slot-time">' + s[0] + '</div><div class="slot-text">' + s[1] + '</div></div>';
+      }).join('');
+      return '<div class="day-card">' +
+        '<div class="day-card-header">' + day.title + '</div>' +
+        '<div class="day-card-body">' + slotsHtml + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  document.querySelectorAll('.phase-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      document.querySelectorAll('.phase-btn').forEach(function (b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      render(btn.getAttribute('data-phase'));
+    });
+  });
+
+  render('p1');
+})();
+</script>
+
+</body>
+</html>
